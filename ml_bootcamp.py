@@ -34,9 +34,12 @@ import requests  # For HTTP requests to download data
 #
 # Key Questions to Consider:
 # - What is the target variable?
+#   - Quality rating
 # - Assuming we are able to optimize and make recommendations,
 #   how does this translate into a business context?
+#   - Which cereals should businesses stock to get the best sales?
 # - Prediction problem: Classification or Regression?
+#   - Numeric variable: regression
 # - Independent Business Metric: Assuming that higher ratings result in
 #   higher sales, can we predict which new cereals that enter the market
 #   over the next year will perform the best?
@@ -173,6 +176,9 @@ numeric_cols = list(cereal.select_dtypes('number'))
 cereal[numeric_cols] = MinMaxScaler().fit_transform(cereal[numeric_cols])
 # Now all numeric features are on the same scale (0 to 1)
 # This is crucial for distance-based algorithms!
+
+# %%
+cereal
 
 # %% [markdown]
 # ### One-Hot Encoding
@@ -338,6 +344,48 @@ print(job.head())
 # Explore the structure of the dataset
 job.info()
 # Check for data types and identify which columns need type conversion
+# Salary column needs to be removed - too many missing values
+job = job.drop('salary', axis = 1)
+#job.head()
+
+# %% 
+# Category tuning
+cat_cols = []
+job['gender'].value_counts() # This column is fine
+cat_cols.append('gender')
+job["ssc_b"].value_counts() # This col is also fine
+cat_cols.append('ssc_b')
+job['hsc_b'].value_counts() # Good
+cat_cols.append('hsc_b')
+job['hsc_s'].value_counts() # Good
+cat_cols.append('hsc_s')
+job['degree_t'].value_counts() # Good
+cat_cols.append('degree_t')
+job['workex'].value_counts() # Good
+cat_cols.append('workex')
+job['specialisation'].value_counts() # Good
+cat_cols.append('specialisation')
+job['status'].value_counts() # Good
+cat_cols.append('status')
+job[cat_cols] = job[cat_cols].astype('category')
+job.info()
+
+# %%
+# Numeric modifications
+ls = list(job.select_dtypes('number'))
+for col in ls:
+    print(job[col].nunique()) # looks like all of these are reasonably unique
+    plt.hist(job[col], alpha=0.5) # not all the data is normally distributed
+    # the ID column should be ignored
+
+ls.remove('sl_no')
+job[ls] = MinMaxScaler().fit_transform(job[ls])
+job.head()
+
+# %%
+# One-hot encode categories
+job_enc = pd.get_dummies(job, columns=cat_cols)
+job_enc.head()
 
 # %%
 # Load another dataset for practice
