@@ -82,6 +82,12 @@ cereal[cols] = cereal[cols].astype('category')
 # Check the data types to confirm changes
 cereal.dtypes  # Simpler than .info(), shows just the data types
 
+#%%
+print(cereal['vitamins'].nunique())
+print(cereal['shelf'].nunique())
+
+## Categorical variables give error as numeric values 
+## since models more heavily weight categories they know better
 # %%
 # Let's take a closer look at the manufacturer (mfr) variable
 # value_counts() displays the frequency of each unique value
@@ -179,6 +185,8 @@ cereal[numeric_cols] = MinMaxScaler().fit_transform(cereal[numeric_cols])
 
 # %%
 cereal
+## Measures of distance for models like KNN don't make sense if data 
+## isn't appropriately scaled
 
 # %% [markdown]
 # ### One-Hot Encoding
@@ -208,6 +216,7 @@ cereal_encoded = pd.get_dummies(cereal, columns=category_list)
 # Check the result
 cereal_encoded.info()
 # Notice: Each category now has its own column with 1s and 0s!
+# Notably, some models do this process for you, like decision trees
 
 # %% [markdown]
 # ### Baseline/Prevalence
